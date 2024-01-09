@@ -4,6 +4,7 @@ import OpenSSL.crypto as crypto
 from datetime import datetime
 import csv
 import argparse
+from tqdm import tqdm
 
 
 # 函数：从域名中提取主域名
@@ -79,12 +80,13 @@ def main():
         elif args.file:
             try:
                 with open(args.file, 'r') as domains_file:
-                    for domain in domains_file:
+                    domains = domains_file.readlines()
+                    for domain in tqdm(domains, desc="Processing Domains"):
                         domain = domain.strip()
                         if domain:
                             issues = check_ssl_expiry(domain)
                             if issues:
-                                writer.writerow([args.url] + issues)
+                                writer.writerow([domain] + issues)
             except FileNotFoundError:
                 print(f"File not found: {args.file}")
         else:
